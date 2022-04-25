@@ -3,6 +3,7 @@ package com.udemy.crud.service;
 import com.udemy.crud.data.vo.ProdutoVO;
 import com.udemy.crud.entity.Produto;
 import com.udemy.crud.exception.NotFoundException;
+import com.udemy.crud.message.ProdutoSendMessage;
 import com.udemy.crud.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,14 +14,18 @@ import org.springframework.stereotype.Service;
 public class ProdutoService {
 
     protected final ProdutoRepository produtoRepository;
+    protected final ProdutoSendMessage produtoSendMessage;
 
     @Autowired
-    public ProdutoService(ProdutoRepository produtoRepository) {
+    public ProdutoService(ProdutoRepository produtoRepository,
+                          ProdutoSendMessage produtoSendMessage) {
         this.produtoRepository = produtoRepository;
+        this.produtoSendMessage = produtoSendMessage;
     }
 
     public ProdutoVO create(ProdutoVO produtoVO) {
         var produto = produtoRepository.save(Produto.of(produtoVO));
+        produtoSendMessage.sendMessage(ProdutoVO.of(produto));
         return ProdutoVO.of(produto);
     }
 
